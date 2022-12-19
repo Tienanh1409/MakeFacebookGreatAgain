@@ -1,11 +1,19 @@
 """
 123
 """
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.params import Body
+from pydantic import BaseModel
 
 app = FastAPI()
 
+
+class Post(BaseModel):
+    title : str
+    body : str
+    published: bool = True
+    rating: Optional[int] = None
 
 @app.get("/")
 async def read_root():
@@ -21,4 +29,5 @@ async def get_posts():
 @app.post("/createpost")
 async def create_a_post(payload: dict = Body(...)):
     """ Hello"""
-    return {"message" : "Create a post successfully", "title" : payload.get("title") , "body" : payload.get("body")}
+    return {"message" : "Create a post successfully",
+     "title" : payload.get("title") , "body" : payload.get("body")}
