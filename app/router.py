@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Path, Depends
+from fastapi import APIRouter, HTTPException, Path, Depends, status
 from .config import SessionLocal
 from sqlalchemy.orm import Session
 from .schemas import PostSchema, RequestPost, Response
@@ -14,21 +14,22 @@ def get_db():
         db.close()
 
 
-@router.post('/create')
+@router.post('/create', status_code=status.HTTP_201_CREATED)
 async def create(request:RequestPost, db: Session=Depends(get_db)):
     crud.create_post(db, request.parameter)
     return Response(code=201, status="Ok", message="Book created successfully").dict(exclude_none=True)
 
 @router.get('/posts/')
 async def get_posts(page: int, size: int, db:Session=Depends(get_db) ):
-    print(page, size)
     posts , total =  crud.get_posts(page, size, db)
     return Response(code=200, status="Ok", message="This is all posts", total =total, page = page, size=size, result=posts)
 
-@router.get('/post/{id}')
-async def get_post(id:int, db:Session=Depends(get_db)):
+@router.get('/post/{id}', status_code=status.HTTP_201_CREATED)
+async def get_post(id: int, db:Session=Depends(get_db)):
     post = crud.get_post_by_id(db, id)
-    return Response(code=200, status="Ok", message=f"This is the post with id = {id}", result=post)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Cannot found post with id {id}")
+    return Response(code=201, status="Ok", message=f"This is the post with id = {id}", result=post)
 
 
 @router.patch('/update')

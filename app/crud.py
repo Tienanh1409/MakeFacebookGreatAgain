@@ -1,13 +1,18 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select
 from .model import Post
 from .schemas import PostSchema
 
-def get_posts(page:int, size:int, db:Session):
-    posts = db.query(Post, func.count('id').over().label('total_post')).limit(size).offset(page*size).all()
+def get_posts(page:int, size:int, db: Session):
     total = 0
+    stmt = select(Post).add_columns(func.count().over().label('total')).order_by(Post.id)
+    if size:
+        stmt = stmt.limit(size)
+    if page:
+        stmt = stmt.offset(page * size)
+    posts = db.execute(stmt).all()
     if posts:
-        total = posts[0].total_post
+        total = getattr(posts[0], "total", 0)
     return posts , total
 
 def get_post_by_id(db:Session, post_id:int):
