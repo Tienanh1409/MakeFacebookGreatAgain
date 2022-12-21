@@ -10,6 +10,10 @@ class Post(Base):
     body = Column(String)
     published = Column(Boolean, default = False)
 
-    
 
-    
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key = True)
+    email = Column(String, nullable=False, unique = True)
+    password = Column(String, nullable=False)

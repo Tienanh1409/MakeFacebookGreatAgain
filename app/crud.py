@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, select
-from .model import Post
-from .schemas import PostSchema
+from .model import Post, User
+from .schemas import PostSchema, RequestUser
+
 
 def get_posts(page:int, size:int, db: Session):
     total = 0
@@ -37,3 +38,17 @@ def update_post(db:Session, post_id:int, post_title: str, post_body:str):
     db.commit()
     db.refresh(_post)
     return _post
+
+
+def create_user(db:Session, user: RequestUser):
+    _user = User(email=user.email, password=user.password)
+    db.add(_user)
+    db.commit()
+    db.refresh(_user)
+    return _user
+
+def get_users(db:Session):
+    stmt = select(User)
+    users = db.execute(stmt).fetchall()
+    return users
+
