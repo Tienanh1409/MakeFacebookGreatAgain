@@ -1,7 +1,9 @@
-from typing import List, Optional, Generic, TypeVar
+from typing import Optional, Generic, TypeVar
 from pydantic import BaseModel, Field, EmailStr
 from pydantic.generics import GenericModel
+
 T = TypeVar('T')
+
 
 class PostSchema(BaseModel):
     id: Optional[int] = None
@@ -17,7 +19,7 @@ class RequestPost(BaseModel):
     parameter: PostSchema = Field(...)
 
 
-class Response( GenericModel, Generic[T]):
+class Response(GenericModel, Generic[T]):
     code: str
     status: str
     message: str
@@ -26,6 +28,7 @@ class Response( GenericModel, Generic[T]):
     size: Optional[int]
     result: Optional[T]
 
+
 class UserSchema(BaseModel):
     id: Optional[int] = None
     email: EmailStr
@@ -33,6 +36,7 @@ class UserSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class RequestUser(BaseModel):
     parameter: UserSchema = Field(...)
