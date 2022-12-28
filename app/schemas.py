@@ -32,7 +32,9 @@ class Response(GenericModel, Generic[T]):
 class UserSchema(BaseModel):
     id: Optional[int] = None
     email: EmailStr
-    password: str
+    username: str = Field(min_length=6, max_length=20)
+    password: str = Field(min_length=6, max_length=20)
+    confirm_password: str = Field(min_length=6, max_length=20)
 
     class Config:
         orm_mode = True
@@ -40,3 +42,21 @@ class UserSchema(BaseModel):
 
 class RequestUser(BaseModel):
     parameter: UserSchema = Field(...)
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class RequestUserLogin(BaseModel):
+    parameter: UserLogin = Field(...)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: Optional[int] = None
