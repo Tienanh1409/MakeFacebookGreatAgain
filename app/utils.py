@@ -1,17 +1,14 @@
 from fastapi import APIRouter
-from app.config import SessionLocal
+from sqlalchemy.orm import sessionmaker
 from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
+import logging
+
+from app.config import async_engine
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+logger = logging.getLogger(__name__)
 
 
 def hash_password(password: str):
@@ -20,3 +17,11 @@ def hash_password(password: str):
 
 def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+
+async def get_session() -> AsyncSession:
+    async_session = sessionmaker(
+        bind=async_engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
+        yield session
