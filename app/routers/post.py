@@ -39,8 +39,9 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_session)):
 
 
 @router.patch('/update', status_code=status.HTTP_200_OK)
-async def update_post(request: CreatePost, session: AsyncSession = Depends(get_session)):
-    post = await user_update_post(session, request.parameter.id, request.parameter.title, request.parameter.body)
+async def update_post(request: CreatePost, session: AsyncSession = Depends(get_session),
+                      get_current_user_id: TokenData = Depends(get_current_user)):
+    post = await user_update_post(session, request.parameter, get_current_user_id.id)
     return ResponsePost(status="Ok", message=f"This is the post with id = {post.id} after update",
                         result=post)
 

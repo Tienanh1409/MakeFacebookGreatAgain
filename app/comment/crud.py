@@ -32,3 +32,13 @@ async def get_comment_by_id(session: AsyncSession, comment_id: int):
     stmt = select(Comment).where(Comment.id == comment_id)
     result = await session.execute(stmt)
     return result.fetchone()
+
+
+async def delete_comment(session: AsyncSession, comment_id: int, user_id: int):
+    _comment = await get_comment_by_id(session, comment_id)
+    if _comment.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Permission denied")
+    await session.delete(_comment)
+    await session.commit()
+    return True
