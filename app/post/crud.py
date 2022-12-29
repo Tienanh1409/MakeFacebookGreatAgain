@@ -3,6 +3,7 @@ from sqlalchemy import func, select
 from app.model import (
     Post
 )
+from fastapi import HTTPException, status
 from app.post.schemas import PostSchema
 
 
@@ -41,10 +42,12 @@ async def remove_post(session: AsyncSession, post_id: int):
     return True
 
 
-async def user_update_post(session: AsyncSession, post_id: int, post_title: str, post_body: str):
-    _post = await get_post_by_id(post_id, session)
-    _post.title = post_title
-    _post.body = post_body
+async def user_update_post(session: AsyncSession, post: PostSchema, user_id: int):
+    _post = await get_post_by_id(post.id, session)
+    if user_id != _post.user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
+    _post.title = post.title
+    _post.body = post.body
     await session.commit()
     await session.refresh(_post)
     return _post
