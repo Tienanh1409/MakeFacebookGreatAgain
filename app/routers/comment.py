@@ -6,9 +6,15 @@ from app.utils import get_session
 from fastapi import Depends, status, APIRouter
 
 from app.oauth2 import get_current_user
-from app.comment.crud import create_comment, user_update_comment, delete_comment
+from app.comment.crud import create_comment, user_update_comment, delete_comment, get_comments_by_post_id
 
 router = APIRouter()
+
+
+@router.get('/{post_id}', status_code=status.HTTP_200_OK)
+async def get_comments_of_post(post_id: int, session: AsyncSession = Depends(get_session)):
+    comments = await get_comments_by_post_id(session, post_id)
+    return comments
 
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)

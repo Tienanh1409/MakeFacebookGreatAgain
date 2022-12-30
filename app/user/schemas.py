@@ -7,7 +7,6 @@ T = TypeVar('T')
 
 
 class UserSchema(BaseModel):
-    gender_id: Optional[int] = None
     email: EmailStr
     username: str = Field(min_length=6, max_length=20)
     password: str = Field(min_length=6, max_length=20)

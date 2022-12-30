@@ -24,7 +24,7 @@ async def get_posts(page: int, size: int, session: AsyncSession):
 async def get_post_by_id(post_id: int, session: AsyncSession):
     stmt = select(Post).where(Post.id == post_id)
     result = await session.execute(stmt)
-    return result.scalar_one_or_none()
+    return result.fetchone()
 
 
 async def create_post(session: AsyncSession, post: PostSchema, owner_post_id: int):
@@ -35,8 +35,10 @@ async def create_post(session: AsyncSession, post: PostSchema, owner_post_id: in
     return _post
 
 
-async def remove_post(session: AsyncSession, post_id: int):
-    _post = get_post_by_id(post_id, session)
+async def delete_post(session: AsyncSession, post_id: int, user_id: int):
+    _post = await get_post_by_id(post_id, session)
+    if not _post or _post.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission denied")
     await session.delete(_post)
     await session.commit()
     return True
@@ -51,3 +53,9 @@ async def user_update_post(session: AsyncSession, post: PostSchema, user_id: int
     await session.commit()
     await session.refresh(_post)
     return _post
+
+
+async def get_posts_by_user_id(session: AsyncSession, user_id: int):
+    stmt = select(Post).where(Post.user_id == user_id)
+    result = await session.execute(stmt)
+    return result.fetchall()
