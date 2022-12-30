@@ -42,3 +42,10 @@ async def delete_comment(session: AsyncSession, comment_id: int, user_id: int):
     await session.delete(_comment)
     await session.commit()
     return True
+
+
+async def get_comments_by_post_id(session: AsyncSession, post_id: int):
+    stmt = select(Comment).where(Comment.post_id == post_id)
+    result = await session.execute(stmt)
+    return result.fetchall()
+

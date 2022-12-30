@@ -20,3 +20,4 @@ async def create(request: RequestUser, session: AsyncSession = Depends(get_sessi
 async def get_all(session: AsyncSession = Depends(get_session)):
     users = await get_users(session)
     return ResponsePost(code=200, status="Ok", message="This all the user", result=users)
+

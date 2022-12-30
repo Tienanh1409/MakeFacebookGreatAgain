@@ -14,7 +14,7 @@ async def create_user(session: AsyncSession, user: UserSchema):
     if user.password != user.confirm_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The passwords you entered do not match.")
     hashed_password = hash_password(user.password)
-    _user = User(email=user.email, password=hashed_password, username=user.username, gender_id=user.gender_id)
+    _user = User(email=user.email, password=hashed_password, username=user.username)
     session.add(_user)
     await session.commit()
     await session.refresh(_user)
